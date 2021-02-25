@@ -1,26 +1,90 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// Импортировать зависимости
+import * as React from 'react';
 
-function App() {
+// Импортировать компоненты
+import TodoForm from './components/todo-form';
+import TodoList from './components/todo-list';
+
+// Импортировать интерфейсы
+import { TodoInterface } from './interfaces';
+
+// Импортировать стили
+import './styles/styles.css';
+
+// TodoListApp компонент
+const TodoListApp = () => {
+  const [todos, setTodos] = React.useState<TodoInterface[]>([]);
+
+  // Создать новую todo item
+  function handleTodoCreate(todo: TodoInterface) {
+    // Подготовить новое состояние задач
+    const newTodosState: TodoInterface[] = [...todos];
+
+    // Обновить новое состояние задач
+    newTodosState.push(todo);
+
+    // Обновить состояние задач
+    setTodos(newTodosState);
+  }
+
+  // Обновить существующий элемент задачи
+  function handleTodoUpdate(event: React.ChangeEvent<HTMLInputElement>, id: string) {
+    // Подготовить новое todos state
+    const newTodosState: TodoInterface[] = [...todos];
+
+    // Найдите нужный элемент для обновления
+    newTodosState.find((todo: TodoInterface) => todo.id === id)!.text = event.target.value;
+
+    // Обновить todos state 
+    setTodos(newTodosState);
+  }
+
+  // Удалить существующий элемент задачи
+  function handleTodoRemove(id: string) {
+    // Подготовить новое состояние задач
+    const newTodosState: TodoInterface[] = todos.filter((todo: TodoInterface) => todo.id !== id)
+
+    // Обновить состояние задач
+    setTodos(newTodosState);
+  }
+
+  // Отметить существующий элемент задачи как завершенный
+  function handleTodoComplete(id: string) {
+    // Копировать текущее состояние задач
+    const newTodosState: TodoInterface[] = [...todos];
+
+    // Найдите нужный элемент задачи и обновите его ключ isCompleted
+    newTodosState.find((todo: TodoInterface) => todo.id === id)!.isCompleted = !newTodosState.find((todo: TodoInterface) => todo.id === id)!.isCompleted;
+
+    // Обновить todos state
+    setTodos(newTodosState);
+  }
+
+  // Проверьте, есть ли у элемента дела заголовок
+  function handleTodoBlur(event: React.ChangeEvent<HTMLInputElement>) {
+    if (event.target.value.length === 0) {
+      event.target.classList.add('todo-input-error');
+    } else {
+      event.target.classList.remove('todo-input-error');
+    }
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='todo-list-app'>
+      <TodoForm 
+        todos = { todos }
+        handleTodoCreate = { handleTodoCreate }
+      />
+
+      <TodoList
+        todos = { todos }
+        handleTodoUpdate = { handleTodoUpdate }
+        handleTodoRemove = { handleTodoRemove }
+        handleTodoComplete = { handleTodoComplete }
+        handleTodoBlur = { handleTodoBlur }
+      />
     </div>
-  );
+  )
 }
 
-export default App;
+export default TodoListApp;
